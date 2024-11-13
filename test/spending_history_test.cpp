@@ -24,3 +24,16 @@ TEST_CASE("Database is initialized correctly")
     REQUIRE(totals[3] == TotalSpent(Company("Tagcat",        "Cupertino"),     Money(300)));
     REQUIRE(totals[4] == TotalSpent(Company("Vinder",        "Livermore"),     Money(100)));
 }
+
+TEST_CASE("Duplicates are handled correctly")
+{
+    SpendingHistory history;
+    history.addReceipt(Company("Vinder", "Livermore"), Money(100));
+    history.addReceipt(Company("Vinder", "Livermore"), Money(100));
+    history.addReceipt(Company("Wikibox", "San Jose"), Money(250));
+
+    vector<TotalSpent> totals = history.getTotals();
+    REQUIRE(totals.size() == 2);
+    REQUIRE(totals[0] == TotalSpent(Company("Wikibox", "San Jose"), Money(250)));
+    REQUIRE(totals[1] == TotalSpent(Company("Vinder", "Livermore"), Money(200)));
+}
